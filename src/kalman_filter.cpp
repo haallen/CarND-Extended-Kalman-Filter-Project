@@ -2,6 +2,7 @@
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+double pi = 3.14159; //seriously, i have to define pi??
 
 KalmanFilter::KalmanFilter() {}
 
@@ -66,6 +67,15 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	z_pred << rho, theta, rhodot;
 
 	VectorXd y = z - z_pred;
+
+	//y(1) is an angle and should be between -pi and +pi
+	//this is a rough way of making that happen
+	if (y(1) > pi){
+		y(1) = y(1)-2*pi;
+	}else if (y(1) < -pi){
+		y(1) = y(1) + 2*pi;
+	}
+
 	MatrixXd Ht = H_.transpose();
 	MatrixXd S = H_ * P_ * Ht + R_;
 	MatrixXd Si = S.inverse();
